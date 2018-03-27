@@ -35,14 +35,14 @@ services:
     - "8080:8080"
   golerta:
     build:
-      context: https://github.com/allen13/golerta.git#master
+      context: https://github.com/allen13/golerta.git#feature/viper-config
+    volumes:
+    - ./golerta.toml:/golerta.toml
     environment:
-    - RETHINKDB_ADDRESS=rethinkdb:28015
+    - GOLERTA_RETHINKDB_ADDRESS=rethinkdb:28015
     ports:
     - "5608:5608"
     links:
     - rethinkdb
     depends_on:
     - rethinkdb
-volumes:
-  logvolume01: {}
