@@ -1,6 +1,8 @@
 InfluxDB Docker Stack
 =====================
 
+**This is a local development example, all data is ephemeral and this should not be used as is for production**
+
 Components
 ----------
 
