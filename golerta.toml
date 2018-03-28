@@ -1,14 +1,14 @@
 [app]
     bind_addr = ":5608"
     signing_key = "example-secret"
-    auth_provider = "ldap"
+    auth_provider = "noop"
     continuous_query_interval = "5s"
     log_alert_requests = false
 
 [flapdetection]
     enabled = true
     half_life_seconds = 60.0
-    threshold = 4.0
+    threshold = 2.0
     minimum_score = 0.02
 
 [ldap]

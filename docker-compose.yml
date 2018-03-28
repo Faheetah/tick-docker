@@ -30,6 +30,17 @@ services:
     depends_on:
     - influxdb
     - kapacitor
+    environment:
+    - INFLUXDB_URL=http://influxdb:8086
+    - KAPACITOR_URL=http://kapacitor:9092
+  grafana:
+    image: grafana/grafana
+    links:
+      - influxdb
+    ports:
+    - "3000:3000"
+    depends_on:
+    - influxdb
   rethinkdb:
     image: rethinkdb
     ports:

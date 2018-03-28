@@ -4,11 +4,16 @@ InfluxDB Docker Stack
 Components
 ----------
 
+**TICK Stack**
 * Telegraf: Monitoring agent similar to collectd, can funnel to InfluxDB as well as Graphite, Datadog, and others
 * InfluxDB: Performant time series database with a rich query language, accepting several inputs including Telegraf, it's native agent
 * Chronograf: Administration UI for InfluxDB. Can configure Kapacitor, query InfluxDB, explore Telegraf hosts, set retention policies and continuous queries, and create dsahboards
 * Kapacitor: Automation service that complements InfluxDB. Completely decoupled like all other components, and can accept a range of inputs (including reading from InfluxDB or from Telegraf directly) and send alerts to many integrations (Pagerduty, Slack, Alerta and by extension Golerta)
+
+**Complementary Services**
+* Grafana: A more featured dashboard that can read from many sources, including InfluxDB, Datadog, Elasticsearch, and more. Has an expansive plugin community.
 * Golerta: Fork of Alerta written in Golang. Meant to be a simple alerting dashboard fed from Kapacitor and a source of truth for alert states. Integrates with Pagerduty and includes alert correlation and flap detection similar to Kapacitor
+* Breakit: Under the breakit/ folder, a Go binary that serves a few endpoints to generate fake stats. Includes seasonal data, trending, and random, plus an endpoint to return various error codes.
 
 Prerequisites
 -------------
@@ -51,6 +56,8 @@ Start Docker. Navigate to this directory. Run ```docker-compose build``` to buil
 
 Note: if using docker-machine, get the IP from ```docker-machine ls``` instead, this will be the base IP for all URLs instead of localhost). Within the Docker infrastructure, the following names are used: telegraf, influxdb, chronograf, kapacitor, rethinkdb, golerta. These names can be referenced directly as hosts instead of IPs as Docker links these containers together.
 
-Chronograf will open the new InfluxDB connection page. Change the connection string to http://influxdb:8086. The *telegraf* database should be automatically enabled. Navigate to Configuration > Add Kapacitor Connection. For the Kapacitor URL, use http://kapacitor:9092. Configure Alerta with the token from ```docker-compose exec golerta /golerta createAgentToken example-secret``` (if you change the secret key, use that instead), copy the output into the *Token* field, hit *Save Changes*, then *Send Test Alert*.
+Chronograf should already have InfluxDB and Kapacitor configured, and Golerta is set to no auth. If InfluxDB or Kapacitor are not configured, use *http://influxdb:8086* and *http://kapacitor:9092*. If configuring Golerta, edit the Kapacitor configuration and set Alerta with the token from ```docker-compose exec golerta /golerta createAgentToken example-secret``` (if you change the secret key, use that instead), copy the output into the *Token* field, hit *Save Changes*, then *Send Test Alert*.
 
 Navigate to http://localhost:5608 and login with username **gauss** and password **password** to see the test alert opened. From here you can add additional Telegraf or Kapacitor configs, either by modifying *docker-compose.yml* or adding Kapacitor alerts in Chronograf under Alerts > Manage Tasks.
+
+Access Grafana with http://localhost:3000 and login with username **admin** password **admin**. Add the InfluxDB database as a data source with *http://influxdb:8086*, using the *telegraf* database. Feel free to create dashboards and play with the data.
