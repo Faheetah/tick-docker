@@ -7,6 +7,7 @@ services:
     - ./telegraf.conf:/etc/telegraf/telegraf.conf
     links:
     - influxdb
+    - breakit
     image: telegraf
     depends_on:
     - influxdb
@@ -46,3 +47,8 @@ services:
     - rethinkdb
     depends_on:
     - rethinkdb
+  breakit:
+    build:
+      context: breakit/
+    ports:
+    - "1323:1323"
