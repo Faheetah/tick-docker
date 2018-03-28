@@ -247,6 +247,12 @@
               {
                 "params": [],
                 "type": "max"
+              },
+              {
+                "params": [
+                  "*10"
+                ],
+                "type": "math"
               }
             ]
           ],
@@ -278,9 +284,10 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "decimals": null,
+          "format": "s",
           "label": null,
-          "logBase": 10,
+          "logBase": 1,
           "max": null,
           "min": null,
           "show": true
@@ -534,10 +541,10 @@
       },
       "yaxes": [
         {
-          "format": "short",
+          "format": "percent",
           "label": null,
           "logBase": 1,
-          "max": null,
+          "max": "100",
           "min": null,
           "show": true
         },
@@ -929,5 +936,5 @@
   "timezone": "",
   "title": "Example",
   "uid": "knjufwkmk",
-  "version": 5
+  "version": 9
 }
