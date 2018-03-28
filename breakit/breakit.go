@@ -10,7 +10,14 @@ import (
 	"github.com/labstack/echo"
 )
 
+func weightedRand() (n int) {
+	second := time.Now().Second()
+	n = ((second%10)/(1+rand.Intn(5))) * 100 + rand.Intn(100)
+	return
+}
+
 func main() {
+	rand.Seed(time.Now().UnixNano())
 	e := echo.New()
 
 	// Always return a static metric
@@ -22,7 +29,9 @@ func main() {
 	status := 200
 
 	e.GET("/status", func(c echo.Context) error {
-		return c.String(status, fmt.Sprintf(""))
+		r := weightedRand()
+		time.Sleep(time.Duration(r) * time.Millisecond)
+		return c.String(status, fmt.Sprintf("{\"value\": %d}", r))
 	})
 
 	e.GET("/status/:status", func(c echo.Context) error {
@@ -39,7 +48,7 @@ func main() {
 	base := time.Now()
 	e.GET("/trending", func(c echo.Context) error {
 		d := time.Now().Sub(base)
-		t := (d.Seconds() + float64(rand.Intn(5))) / 10
+		t := (d.Seconds() + float64(rand.Intn(30))) / 10
 		return c.String(200, fmt.Sprintf("{\"value\": %02f}", t))
 	})
 

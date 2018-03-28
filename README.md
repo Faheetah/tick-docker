@@ -20,7 +20,7 @@ Components
 Prerequisites
 -------------
 
-Install Docker for the destined platform:
+Install Docker for the destined platform, recommended to give the machine 4GB:
 
 **Windows**
 
@@ -54,12 +54,12 @@ In a project, run ```mntc```, the reason for this is the docker-machine VM does 
 Running
 -------
 
-Start Docker. Navigate to this directory. Run ```docker-compose build``` to build Golerta, then ```docker-compose up -d``` to start the services. Navigate to the Chronograf instance, AKA http://localhost:8888.
+All links to *http://localhost* should be viewable in a browser. If docker-machine is used, get the IP from ```docker-machine ls``` instead, this will be the base IP for all URLs instead of localhost). Within the Docker infrastructure, the following names are used: telegraf, influxdb, chronograf, kapacitor, rethinkdb, golerta. These names can be referenced directly within the containers as Docker aliases the containers to their IPs.
 
-Note: if using docker-machine, get the IP from ```docker-machine ls``` instead, this will be the base IP for all URLs instead of localhost). Within the Docker infrastructure, the following names are used: telegraf, influxdb, chronograf, kapacitor, rethinkdb, golerta. These names can be referenced directly as hosts instead of IPs as Docker links these containers together.
+Start Docker. Navigate to this directory. Run ```docker-compose up -d``` to start the services. The needed images should build automatically with the "up" command, but to build them, or rebuild if they have been updated, use ```docker-compose up -d --build```. When all containers are up, navigate to the Chronograf instance, AKA http://localhost:8888.
 
-Chronograf should already have InfluxDB and Kapacitor configured, and Golerta is set to no auth. If InfluxDB or Kapacitor are not configured, use *http://influxdb:8086* and *http://kapacitor:9092*. If configuring Golerta, edit the Kapacitor configuration and set Alerta with the token from ```docker-compose exec golerta /golerta createAgentToken example-secret``` (if you change the secret key, use that instead), copy the output into the *Token* field, hit *Save Changes*, then *Send Test Alert*.
+Chronograf should already have InfluxDB and Kapacitor configured, and Golerta is set to no auth. If InfluxDB or Kapacitor are not configured, use *http://influxdb:8086* and *http://kapacitor:9092*. If configuring Golerta, edit the Kapacitor configuration and set Alerta with the token from ```docker-compose exec golerta /golerta createAgentToken example-secret``` (if you change the secret key, use that instead), copy the output into the *Token* field, hit *Save Changes*, then *Send Test Alert*. Kapacitor alerts can be configured under Alerts > Tasks. Kapacitor alerts can be added in Chronograf under Alerts > Manage Tasks or by editing kapacitor.conf and restarting the container ```docker-compose restart kapacitor```.
 
-Navigate to http://localhost:5608 and login with username **gauss** and password **password** to see the test alert opened. From here you can add additional Telegraf or Kapacitor configs, either by modifying *docker-compose.yml* or adding Kapacitor alerts in Chronograf under Alerts > Manage Tasks.
+Navigate to http://localhost:5608, which should not need credential. If LDAP is configured by setting the provider in golerta.toml ```auth_provider = "ldap", the login is username **gauss** and password **password**.
 
-Access Grafana with http://localhost:3000 and login with username **admin** password **admin**. Add the InfluxDB database as a data source with *http://influxdb:8086*, using the *telegraf* database. Feel free to create dashboards and play with the data.
+Access Grafana with http://localhost:3000 and login with username **admin** password **admin**. Add the InfluxDB database as a data source with *http://influxdb:8086*, using the *telegraf* database. Feel free to create dashboards and play with the data. An example dashboard export is included under *grafana-dashboards/example.json* that can be imported in the Grafana UI. Under Create (**+** icon) > Import, paste the contents of *example.json*, select *Load*, then on the next page select the *influxdb* data source added earlier. After selecting *Import*, the dashboard should load.
