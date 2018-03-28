@@ -36,10 +36,15 @@ func main() {
 	})
 
 	// Trending
+	base := time.Now()
 	e.GET("/trending", func(c echo.Context) error {
-		d := time.Now()
-		unix := d.Unix()
-		return c.String(200, fmt.Sprintf("{\"value\": %d}", unix+int64(rand.Intn(5))))
+		d := time.Now().Sub(base)
+		return c.String(200, fmt.Sprintf("{\"value\": %d}", d.Seconds() + float64(rand.Intn(5))))
+	})
+
+	e.GET("/trending/reset", func(c echo.Context) error {
+		base = time.Now()
+		return c.String(200, "OK")
 	})
 
 	// Seasonality
