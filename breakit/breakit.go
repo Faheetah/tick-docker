@@ -39,7 +39,8 @@ func main() {
 	base := time.Now()
 	e.GET("/trending", func(c echo.Context) error {
 		d := time.Now().Sub(base)
-		return c.String(200, fmt.Sprintf("{\"value\": %d}", d.Seconds() + float64(rand.Intn(5))))
+		t := (d.Seconds() + float64(rand.Intn(5))) / 10
+		return c.String(200, fmt.Sprintf("{\"value\": %02f}", t))
 	})
 
 	e.GET("/trending/reset", func(c echo.Context) error {
