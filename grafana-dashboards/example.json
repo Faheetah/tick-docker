@@ -178,6 +178,124 @@
       "valueName": "avg"
     },
     {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "fill": 1,
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 3
+      },
+      "id": 6,
+      "interval": "",
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "Response Time",
+          "groupBy": [
+            {
+              "params": [
+                "10s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "http_response",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_time"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "server",
+              "operator": "=",
+              "value": "http://breakit:1323/status"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "API Response Time",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 10,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
+    },
+    {
       "cards": {
         "cardPadding": null,
         "cardRound": null
@@ -195,7 +313,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 3
+        "y": 14
       },
       "heatmap": {},
       "highlightCards": true,
@@ -282,9 +400,9 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 12
+        "y": 23
       },
-      "id": 6,
+      "id": 9,
       "interval": "",
       "legend": {
         "avg": false,
@@ -444,7 +562,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 34
       },
       "id": 2,
       "interval": "",
@@ -613,7 +731,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 45
       },
       "id": 5,
       "interval": "",
@@ -781,7 +899,7 @@
   },
   "time": {
     "from": "now-30m",
-    "to": "now+30m"
+    "to": "now+5m"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -811,5 +929,5 @@
   "timezone": "",
   "title": "Example",
   "uid": "knjufwkmk",
-  "version": 3
+  "version": 5
 }
