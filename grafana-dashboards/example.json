@@ -23,12 +23,6 @@
       "version": "5.0.0"
     },
     {
-      "type": "panel",
-      "id": "heatmap",
-      "name": "Heatmap",
-      "version": "5.0.0"
-    },
-    {
       "type": "datasource",
       "id": "influxdb",
       "name": "InfluxDB",
@@ -79,8 +73,8 @@
         "thresholdMarkers": true
       },
       "gridPos": {
-        "h": 3,
-        "w": 24,
+        "h": 7,
+        "w": 3,
         "x": 0,
         "y": 0
       },
@@ -167,7 +161,7 @@
       "timeFrom": "10s",
       "title": "API Status",
       "type": "singlestat",
-      "valueFontSize": "80%",
+      "valueFontSize": "170%",
       "valueMaps": [
         {
           "op": "=",
@@ -185,10 +179,10 @@
       "datasource": "${DS_INFLUXDB}",
       "fill": 1,
       "gridPos": {
-        "h": 11,
-        "w": 24,
-        "x": 0,
-        "y": 3
+        "h": 7,
+        "w": 21,
+        "x": 3,
+        "y": 0
       },
       "id": 6,
       "interval": "",
@@ -247,10 +241,60 @@
               {
                 "params": [],
                 "type": "max"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "server",
+              "operator": "=",
+              "value": "http://breakit:1323/status"
+            }
+          ]
+        },
+        {
+          "alias": "Anomaly",
+          "groupBy": [
+            {
+              "params": [
+                "1m"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "http_response",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "response_time"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "max"
               },
               {
                 "params": [
-                  "*10"
+                  "10m"
+                ],
+                "type": "non_negative_derivative"
+              },
+              {
+                "params": [
+                  "/100"
                 ],
                 "type": "math"
               }
@@ -303,44 +347,76 @@
       ]
     },
     {
-      "cards": {
-        "cardPadding": null,
-        "cardRound": null
-      },
-      "color": {
-        "cardColor": "#b4ff00",
-        "colorScale": "sqrt",
-        "colorScheme": "interpolateOranges",
-        "exponent": 0.5,
-        "mode": "spectrum"
-      },
-      "dataFormat": "timeseries",
+      "cacheTimeout": null,
+      "colorBackground": true,
+      "colorValue": false,
+      "colors": [
+        "#299c46",
+        "rgba(237, 129, 40, 0.89)",
+        "#d44a3a"
+      ],
       "datasource": "${DS_INFLUXDB}",
-      "gridPos": {
-        "h": 9,
-        "w": 24,
-        "x": 0,
-        "y": 14
+      "format": "none",
+      "gauge": {
+        "maxValue": 100,
+        "minValue": 0,
+        "show": false,
+        "thresholdLabels": false,
+        "thresholdMarkers": true
       },
-      "heatmap": {},
-      "highlightCards": true,
-      "id": 4,
-      "legend": {
+      "gridPos": {
+        "h": 7,
+        "w": 3,
+        "x": 0,
+        "y": 7
+      },
+      "id": 14,
+      "interval": null,
+      "links": [],
+      "mappingType": 1,
+      "mappingTypes": [
+        {
+          "name": "value to text",
+          "value": 1
+        },
+        {
+          "name": "range to text",
+          "value": 2
+        }
+      ],
+      "maxDataPoints": 100,
+      "nullPointMode": "connected",
+      "nullText": null,
+      "postfix": "",
+      "postfixFontSize": "50%",
+      "prefix": "",
+      "prefixFontSize": "50%",
+      "rangeMaps": [
+        {
+          "from": "null",
+          "text": "N/A",
+          "to": "null"
+        }
+      ],
+      "sparkline": {
+        "fillColor": "rgba(31, 118, 189, 0.18)",
+        "full": false,
+        "lineColor": "rgb(31, 120, 193)",
         "show": false
       },
-      "links": [],
+      "tableColumn": "",
       "targets": [
         {
           "groupBy": [
             {
               "params": [
-                "$__interval"
+                "10s"
               ],
               "type": "time"
             },
             {
               "params": [
-                "null"
+                "previous"
               ],
               "type": "fill"
             }
@@ -354,13 +430,13 @@
             [
               {
                 "params": [
-                  "value"
+                  "statusCounts_open"
                 ],
                 "type": "field"
               },
               {
                 "params": [],
-                "type": "mean"
+                "type": "last"
               }
             ]
           ],
@@ -368,33 +444,142 @@
             {
               "key": "server",
               "operator": "=",
-              "value": "http://breakit:1323/random"
+              "value": "http://golerta:5608/alerts/count"
             }
           ]
         }
       ],
-      "title": "Heatmap example",
+      "thresholds": "400,400",
+      "timeFrom": "10s",
+      "title": "Open Alerts",
+      "type": "singlestat",
+      "valueFontSize": "170%",
+      "valueMaps": [
+        {
+          "op": "=",
+          "text": "N/A",
+          "value": "null"
+        }
+      ],
+      "valueName": "avg"
+    },
+    {
+      "aliasColors": {},
+      "bars": true,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "fill": 1,
+      "gridPos": {
+        "h": 7,
+        "w": 21,
+        "x": 3,
+        "y": 7
+      },
+      "id": 13,
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": false,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "groupBy": [
+            {
+              "params": [
+                "1m"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "measurement": "httpjson",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT mean(\"statusCounts_open\") FROM \"httpjson\" WHERE (\"server\" = 'http://golerta:5608/alerts/count') AND $timeFilter GROUP BY time(10s) fill(null)",
+          "rawQuery": false,
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "statusCounts_open"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "last"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "server",
+              "operator": "=",
+              "value": "http://golerta:5608/alerts/count"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Open Alerts",
       "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
         "show": true,
-        "showHistogram": false
+        "values": []
       },
-      "type": "heatmap",
-      "xAxis": {
-        "show": true
-      },
-      "xBucketNumber": null,
-      "xBucketSize": null,
-      "yAxis": {
-        "decimals": null,
-        "format": "short",
-        "logBase": 1,
-        "max": null,
-        "min": null,
-        "show": true,
-        "splitFactor": null
-      },
-      "yBucketNumber": null,
-      "yBucketSize": null
+      "yaxes": [
+        {
+          "decimals": 0,
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
     },
     {
       "aliasColors": {},
@@ -407,7 +592,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 23
+        "y": 14
       },
       "id": 9,
       "interval": "",
@@ -438,7 +623,7 @@
           "groupBy": [
             {
               "params": [
-                "1m"
+                "5m"
               ],
               "type": "time"
             },
@@ -464,8 +649,10 @@
                 "type": "field"
               },
               {
-                "params": [],
-                "type": "stddev"
+                "params": [
+                  3
+                ],
+                "type": "top"
               }
             ]
           ],
@@ -488,7 +675,7 @@
             },
             {
               "params": [
-                "0"
+                "null"
               ],
               "type": "fill"
             }
@@ -525,7 +712,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "CPU (random example)",
+      "title": "CPU",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -569,7 +756,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 34
+        "y": 25
       },
       "id": 2,
       "interval": "",
@@ -600,7 +787,7 @@
           "groupBy": [
             {
               "params": [
-                "10s"
+                "30s"
               ],
               "type": "time"
             },
@@ -627,12 +814,12 @@
               },
               {
                 "params": [],
-                "type": "mean"
+                "type": "first"
               },
               {
                 "params": [
-                  "40",
-                  "10"
+                  10,
+                  2
                 ],
                 "type": "holt_winters_with_fit"
               }
@@ -651,13 +838,13 @@
           "groupBy": [
             {
               "params": [
-                "10s"
+                "30s"
               ],
               "type": "time"
             },
             {
               "params": [
-                "0"
+                "null"
               ],
               "type": "fill"
             }
@@ -678,7 +865,7 @@
               },
               {
                 "params": [],
-                "type": "mean"
+                "type": "first"
               }
             ]
           ],
@@ -694,7 +881,7 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Memory (seasonal example)",
+      "title": "Memory (Holt Winters)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -738,7 +925,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 45
+        "y": 36
       },
       "id": 5,
       "interval": "",
@@ -769,7 +956,7 @@
           "groupBy": [
             {
               "params": [
-                "10s"
+                "10m"
               ],
               "type": "time"
             },
@@ -796,14 +983,11 @@
               },
               {
                 "params": [],
-                "type": "mean"
+                "type": "first"
               },
               {
-                "params": [
-                  "40",
-                  "2"
-                ],
-                "type": "holt_winters_with_fit"
+                "params": [],
+                "type": "difference"
               }
             ]
           ],
@@ -863,7 +1047,342 @@
       "thresholds": [],
       "timeFrom": null,
       "timeShift": null,
-      "title": "Disk (trending example)",
+      "title": "Disk (difference)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "fill": 1,
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "id": 10,
+      "interval": "",
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "Forecast",
+          "groupBy": [
+            {
+              "params": [
+                "10m"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "httpjson",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "first"
+              },
+              {
+                "params": [],
+                "type": "difference"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "server",
+              "operator": "=",
+              "value": "http://breakit:1323/seasonality"
+            }
+          ]
+        },
+        {
+          "alias": "Raw",
+          "groupBy": [
+            {
+              "params": [
+                "10s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "0"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "httpjson",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "server",
+              "operator": "=",
+              "value": "http://breakit:1323/seasonality"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Memory (difference)",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "fill": 1,
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 58
+      },
+      "id": 11,
+      "interval": "",
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": false,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "Forecast",
+          "groupBy": [
+            {
+              "params": [
+                "30s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "httpjson",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "first"
+              },
+              {
+                "params": [
+                  10,
+                  2
+                ],
+                "type": "holt_winters_with_fit"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "server",
+              "operator": "=",
+              "value": "http://breakit:1323/trending"
+            }
+          ]
+        },
+        {
+          "alias": "Raw",
+          "groupBy": [
+            {
+              "params": [
+                "30s"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "httpjson",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "first"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "server",
+              "operator": "=",
+              "value": "http://breakit:1323/trending"
+            }
+          ]
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Disk (Holt Winters)",
       "tooltip": {
         "shared": true,
         "sort": 0,
@@ -905,8 +1424,8 @@
     "list": []
   },
   "time": {
-    "from": "now-30m",
-    "to": "now+5m"
+    "from": "now-1h",
+    "to": "now"
   },
   "timepicker": {
     "refresh_intervals": [
@@ -936,5 +1455,5 @@
   "timezone": "",
   "title": "Example",
   "uid": "knjufwkmk",
-  "version": 9
+  "version": 12
 }

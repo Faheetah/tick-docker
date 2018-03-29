@@ -29,8 +29,7 @@ const indexHtml = `
 `
 
 func weightedRand() (n int) {
-	second := time.Now().Second()
-	n = ((second%10)/(1+rand.Intn(5))) * 100 + rand.Intn(100)
+	n = 100 + (1000/(1+rand.Intn(100)))
 	return
 }
 
