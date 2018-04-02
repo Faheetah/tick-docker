@@ -19,7 +19,7 @@ const indexHtml = `
 		<h4><a href="/golerta/"    onclick="javascript:event.target.port=5608">Golerta</a></h4>
 		<h2>Modify State:</h3>
 		<h4>Current status: %d</h4>
-		<h4>Current trend value: %02f</h4>
+		<h4>Current trend value: %d</h4>
 		<h4><a href="/status/200">Send 200</a></h4>
 		<h4><a href="/status/404">Send 404</a></h4>
 		<h4><a href="/status/500">Send 500</a></h4>
@@ -34,19 +34,30 @@ func weightedRand() (n int) {
 }
 
 var (
-	base = time.Now()
+	base = 0
+	change = 1
 	status = 200
 )
 
 func main() {
+	ticker := time.NewTicker(time.Second)
+    go func() {
+        for range ticker.C {
+			n := base + change
+			if n <= 0 {
+				base = 0
+			} else {
+				base = n
+			}
+        }
+	}()
+
 	rand.Seed(time.Now().UnixNano())
 	e := echo.New()
 
 	// Always return a static metric
 	e.GET("/", func(c echo.Context) error {
-		d := time.Now().Sub(base)
-		t := d.Seconds() / 10
-		return c.HTML(http.StatusOK, fmt.Sprintf(indexHtml, status, t))
+		return c.HTML(http.StatusOK, fmt.Sprintf(indexHtml, status, base))
 	})
 
 	// Mimic status codes by pushing to the server
@@ -68,13 +79,21 @@ func main() {
 
 	// Trending
 	e.GET("/trending", func(c echo.Context) error {
-		d := time.Now().Sub(base)
-		t := (d.Seconds() + float64(rand.Intn(30))) / 10
-		return c.String(200, fmt.Sprintf("{\"value\": %02f}", t))
+		return c.String(200, fmt.Sprintf("{\"value\": %d}", base))
 	})
 
 	e.GET("/trending/reset", func(c echo.Context) error {
-		base = time.Now()
+		base = 0
+		return c.Redirect(http.StatusTemporaryRedirect, "/")
+	})
+
+	e.GET("/trending/:sign/:change", func(c echo.Context) error {
+		a, _ := strconv.Atoi(c.Param("change"))
+		if c.Param("sign") == "-" {
+			change = a * -1
+		} else {
+			change = a
+		}
 		return c.Redirect(http.StatusTemporaryRedirect, "/")
 	})
 

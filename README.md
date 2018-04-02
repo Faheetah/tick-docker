@@ -63,3 +63,15 @@ Chronograf should already have InfluxDB and Kapacitor configured, and Golerta is
 Navigate to http://localhost:5608, which should not need credential. If LDAP is configured by setting the provider in golerta.toml ```auth_provider = "ldap", the login is username **gauss** and password **password**.
 
 Access Grafana with http://localhost:3000 and login with username **admin** password **admin**. Add the InfluxDB database as a data source with *http://influxdb:8086*, using the *telegraf* database. Feel free to create dashboards and play with the data. An example dashboard export is included under *grafana-dashboards/example.json* that can be imported in the Grafana UI. Under Create (**+** icon) > Import, paste the contents of *example.json*, select *Load*, then on the next page select the *influxdb* data source added earlier. After selecting *Import*, the dashboard should load.
+
+Mock Stats
+----------
+
+To generate Telegraf load average (generate load until load average reaches 1):
+
+```
+docker-compose exec telegraf /bin/bash
+md5sum /dev/zero& until egrep '^1' /proc/loadavg; do sleep 1; done && pkill md5sum
+```
+
+Change the API status, or reset the trending stats, log into http://localhost:1323 (or otherwise the breakit container's address). Links exist to send status code changes or reset the trending data. This link also contains links for other components of the TICK stack.

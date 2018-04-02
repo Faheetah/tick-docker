@@ -78,6 +78,7 @@
         "x": 0,
         "y": 0
       },
+      "hideTimeOverride": true,
       "id": 8,
       "interval": null,
       "links": [],
@@ -203,7 +204,17 @@
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [],
+      "seriesOverrides": [
+        {
+          "alias": "Anomaly",
+          "color": "#cffaff",
+          "lines": false,
+          "nullPointMode": "null",
+          "pointradius": 5,
+          "points": true,
+          "yaxis": 2
+        }
+      ],
       "spaceLength": 10,
       "stack": false,
       "steppedLine": false,
@@ -272,6 +283,8 @@
           "measurement": "http_response",
           "orderByTime": "ASC",
           "policy": "default",
+          "query": "SELECT non_negative_derivative(max(\"response_time\"), 10m)  / 100 FROM \"http_response\" WHERE (\"server\" = 'http://breakit:1323/status') AND $timeFilter GROUP BY time(1m) fill(null)",
+          "rawQuery": false,
           "refId": "B",
           "resultFormat": "time_series",
           "select": [
@@ -291,12 +304,6 @@
                   "10m"
                 ],
                 "type": "non_negative_derivative"
-              },
-              {
-                "params": [
-                  "/100"
-                ],
-                "type": "math"
               }
             ]
           ],
@@ -309,7 +316,29 @@
           ]
         }
       ],
-      "thresholds": [],
+      "thresholds": [
+        {
+          "colorMode": "critical",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.5
+        },
+        {
+          "colorMode": "warning",
+          "fill": true,
+          "line": true,
+          "op": "gt",
+          "value": 0.3
+        },
+        {
+          "colorMode": "ok",
+          "fill": true,
+          "line": true,
+          "op": "lt",
+          "value": 0.3
+        }
+      ],
       "timeFrom": null,
       "timeShift": null,
       "title": "API Response Time",
@@ -341,7 +370,7 @@
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "2",
           "show": true
         }
       ]
@@ -370,6 +399,7 @@
         "x": 0,
         "y": 7
       },
+      "hideTimeOverride": true,
       "id": 14,
       "interval": null,
       "links": [],
@@ -424,6 +454,8 @@
           "measurement": "httpjson",
           "orderByTime": "ASC",
           "policy": "default",
+          "query": "SELECT last(\"statusCounts_open\") - last(\"severityCounts_ok\") FROM \"httpjson\" WHERE (\"server\" = 'http://golerta:5608/alerts/count') AND time > now() - 10s fill(previous)",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -494,9 +526,18 @@
       "pointradius": 5,
       "points": false,
       "renderer": "flot",
-      "seriesOverrides": [],
+      "seriesOverrides": [
+        {
+          "alias": "httpjson.Critical",
+          "color": "#e24d42"
+        },
+        {
+          "alias": "httpjson.Flapping",
+          "color": "#e0752d"
+        }
+      ],
       "spaceLength": 10,
-      "stack": false,
+      "stack": true,
       "steppedLine": false,
       "targets": [
         {
@@ -517,8 +558,8 @@
           "measurement": "httpjson",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "SELECT mean(\"statusCounts_open\") FROM \"httpjson\" WHERE (\"server\" = 'http://golerta:5608/alerts/count') AND $timeFilter GROUP BY time(10s) fill(null)",
-          "rawQuery": false,
+          "query": "SELECT last(\"severityCounts_critical\") AS \"Critical\" FROM \"httpjson\" WHERE (\"server\" = 'http://golerta:5608/alerts/count') AND $timeFilter GROUP BY time(1m) fill(null)",
+          "rawQuery": true,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -532,6 +573,12 @@
               {
                 "params": [],
                 "type": "last"
+              },
+              {
+                "params": [
+                  "-asdf"
+                ],
+                "type": "math"
               }
             ]
           ],
@@ -542,6 +589,43 @@
               "value": "http://golerta:5608/alerts/count"
             }
           ]
+        },
+        {
+          "groupBy": [
+            {
+              "params": [
+                "$__interval"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "orderByTime": "ASC",
+          "policy": "default",
+          "query": "SELECT last(\"severityCounts_flapping\") AS \"Flapping\" FROM \"httpjson\" WHERE (\"server\" = 'http://golerta:5608/alerts/count') AND $timeFilter GROUP BY time(1m) fill(null)",
+          "rawQuery": true,
+          "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": []
         }
       ],
       "thresholds": [],
@@ -568,7 +652,7 @@
           "label": null,
           "logBase": 1,
           "max": null,
-          "min": null,
+          "min": "0",
           "show": true
         },
         {
@@ -619,52 +703,6 @@
       "steppedLine": false,
       "targets": [
         {
-          "alias": "Forecast",
-          "groupBy": [
-            {
-              "params": [
-                "5m"
-              ],
-              "type": "time"
-            },
-            {
-              "params": [
-                "null"
-              ],
-              "type": "fill"
-            }
-          ],
-          "hide": false,
-          "measurement": "httpjson",
-          "orderByTime": "ASC",
-          "policy": "default",
-          "refId": "A",
-          "resultFormat": "time_series",
-          "select": [
-            [
-              {
-                "params": [
-                  "value"
-                ],
-                "type": "field"
-              },
-              {
-                "params": [
-                  3
-                ],
-                "type": "top"
-              }
-            ]
-          ],
-          "tags": [
-            {
-              "key": "server",
-              "operator": "=",
-              "value": "http://breakit:1323/random"
-            }
-          ]
-        },
-        {
           "alias": "Raw",
           "groupBy": [
             {
@@ -685,6 +723,50 @@
           "orderByTime": "ASC",
           "policy": "default",
           "refId": "B",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "value"
+                ],
+                "type": "field"
+              },
+              {
+                "params": [],
+                "type": "mean"
+              }
+            ]
+          ],
+          "tags": [
+            {
+              "key": "server",
+              "operator": "=",
+              "value": "http://breakit:1323/random"
+            }
+          ]
+        },
+        {
+          "alias": "Peak",
+          "groupBy": [
+            {
+              "params": [
+                "5m"
+              ],
+              "type": "time"
+            },
+            {
+              "params": [
+                "null"
+              ],
+              "type": "fill"
+            }
+          ],
+          "hide": false,
+          "measurement": "httpjson",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
           "resultFormat": "time_series",
           "select": [
             [
@@ -757,6 +839,124 @@
         "w": 24,
         "x": 0,
         "y": 25
+      },
+      "id": 15,
+      "interval": "",
+      "legend": {
+        "avg": false,
+        "current": false,
+        "max": false,
+        "min": false,
+        "show": true,
+        "total": false,
+        "values": false
+      },
+      "lines": true,
+      "linewidth": 1,
+      "links": [],
+      "nullPointMode": "null",
+      "percentage": false,
+      "pointradius": 5,
+      "points": true,
+      "renderer": "flot",
+      "seriesOverrides": [],
+      "spaceLength": 10,
+      "stack": false,
+      "steppedLine": false,
+      "targets": [
+        {
+          "alias": "Load",
+          "groupBy": [
+            {
+              "params": [
+                "host"
+              ],
+              "type": "tag"
+            }
+          ],
+          "hide": false,
+          "measurement": "system",
+          "orderByTime": "ASC",
+          "policy": "default",
+          "refId": "A",
+          "resultFormat": "time_series",
+          "select": [
+            [
+              {
+                "params": [
+                  "load1"
+                ],
+                "type": "field"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "load5"
+                ],
+                "type": "field"
+              }
+            ],
+            [
+              {
+                "params": [
+                  "load15"
+                ],
+                "type": "field"
+              }
+            ]
+          ],
+          "tags": []
+        }
+      ],
+      "thresholds": [],
+      "timeFrom": null,
+      "timeShift": null,
+      "title": "Load Average",
+      "tooltip": {
+        "shared": true,
+        "sort": 0,
+        "value_type": "individual"
+      },
+      "type": "graph",
+      "xaxis": {
+        "buckets": null,
+        "mode": "time",
+        "name": null,
+        "show": true,
+        "values": []
+      },
+      "yaxes": [
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        },
+        {
+          "format": "short",
+          "label": null,
+          "logBase": 1,
+          "max": null,
+          "min": null,
+          "show": true
+        }
+      ]
+    },
+    {
+      "aliasColors": {},
+      "bars": false,
+      "dashLength": 10,
+      "dashes": false,
+      "datasource": "${DS_INFLUXDB}",
+      "fill": 1,
+      "gridPos": {
+        "h": 11,
+        "w": 24,
+        "x": 0,
+        "y": 36
       },
       "id": 2,
       "interval": "",
@@ -925,7 +1125,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 36
+        "y": 47
       },
       "id": 5,
       "interval": "",
@@ -1091,7 +1291,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 47
+        "y": 58
       },
       "id": 10,
       "interval": "",
@@ -1257,7 +1457,7 @@
         "h": 11,
         "w": 24,
         "x": 0,
-        "y": 58
+        "y": 69
       },
       "id": 11,
       "interval": "",
@@ -1455,5 +1655,5 @@
   "timezone": "",
   "title": "Example",
   "uid": "knjufwkmk",
-  "version": 12
+  "version": 15
 }
