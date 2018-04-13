@@ -2,6 +2,7 @@ version: '3'
 services:
   influxdb:
     image: influxdb
+
   telegraf:
     volumes:
     - ./telegraf.conf:/etc/telegraf/telegraf.conf
@@ -11,15 +12,26 @@ services:
     image: telegraf
     depends_on:
     - influxdb
+
   kapacitor:
     image: kapacitor
     volumes:
     - ./kapacitor.conf:/etc/kapacitor/kapacitor.conf
+    - kapacitor_sockets:/sockets
     links:
     - influxdb
     - golerta
     depends_on:
     - influxdb
+
+  morgoth:
+    build:
+      context: morgoth/
+    volumes:
+      - kapacitor_sockets:/sockets
+    ports:
+    - "6767:6767"
+
   chronograf:
     image: chronograf
     links:
@@ -33,6 +45,7 @@ services:
     environment:
     - INFLUXDB_URL=http://influxdb:8086
     - KAPACITOR_URL=http://kapacitor:9092
+
   grafana:
     image: grafana/grafana
     links:
@@ -41,10 +54,12 @@ services:
     - "3000:3000"
     depends_on:
     - influxdb
+
   rethinkdb:
     image: rethinkdb
     ports:
     - "8080:8080"
+
   golerta:
     build:
       context: https://github.com/allen13/golerta.git#feature/viper-config
@@ -58,8 +73,12 @@ services:
     - rethinkdb
     depends_on:
     - rethinkdb
+
   breakit:
     build:
       context: breakit/
     ports:
     - "1323:1323"
+
+volumes:
+  kapacitor_sockets:
